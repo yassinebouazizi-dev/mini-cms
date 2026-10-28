@@ -20,12 +20,20 @@ Route::get('/bienvenue', function () {
     ]);
 });
 
-// Défi autonome
-Route::get('/version', fn () => 'Laravel ' . app()->version() . ' - PHP ' . PHP_VERSION);
+Route::get('/version', function () {
+    return 'Laravel ' . app()->version() . ' - PHP ' . PHP_VERSION;
+});
 
 Route::get('/heure', function () {
     return view('heure', [
         'heure' => now()->format('H:i'),
         'date' => now()->format('d/m/Y'),
+    ]);
+});
+
+Route::get('/a-propos', function () {
+    return view('a-propos', [
+        'auteur' => 'Yassine Bouazizi',
+        'groupe' => 'MDW32',
     ]);
 });
