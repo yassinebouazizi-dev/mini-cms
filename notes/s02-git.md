@@ -31,4 +31,16 @@ Réponse :
 
 Réponse :
 - Git Credential Manager stocke le jeton d'accès sécurisé dans le Gestionnaire d'identification Windows (entrée `git:https://github.com`).
-- Sur un poste de l'université partagé, il faut impérativement supprimer cet identifiant en fin de séance (via `cmdkey /delete:git:https://github.com/`) pour empêcher l'étudiant suivant d'accéder au compte GitHub ou de pousser du code en notre nom. Sur un ordinateur personnel, on le conserve.
+- Sur un poste de l'université partagé, il faut impérativement supprimer cet identifiant en fin de séance (via `cmdkey /delete:git:https://github.com`) pour empêcher l'étudiant suivant d'accéder au compte GitHub ou de pousser du code en notre nom. Sur un ordinateur personnel, on le conserve.
+
+## 6. Analyse de l'historique (Défi)
+
+Réponse :
+- **Nombre de commits depuis `lab-01`** : 5 commits (`Ajouter les notes Git de la session 02`, `Ajouter la page a-propos`, `Ajouter la capture de la page a-propos`, `Ajouter le README du projet`, `Documenter les routes dans le README`).
+- **Fichiers modifiés** :
+  - `notes/s02-git.md`
+  - `routes/web.php`
+  - `resources/views/a-propos.blade.php`
+  - `screenshots/s02-a-propos.png`
+  - `README.md`
+- **Sortie de `git tag -n`** : `lab-01` affiche le tag suivi du message du commit associé (`lab-01`).
