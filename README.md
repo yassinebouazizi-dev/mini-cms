@@ -1,213 +1,163 @@
 # Mini-CMS
 
-Projet fil rouge de l'Atelier Framework Côté Serveur (Laravel 13, PHP 8.3+), 3e année MDW, ISET Sidi Bouzid.
+## Description
 
-Auteur : Yassine Bouazizi, groupe MDW32.
+Mini-CMS est le projet fil rouge de l'Atelier Framework Côté Serveur (Laravel 13, PHP 8.3+, SQLite), réalisé par Yassine Bouazizi (groupe MDW32, ISET Sidi Bouzid).
 
-Mini-CMS évoluera au fil du semestre vers une petite plateforme de publication : pages publiques, back-office authentifié, API JSON et tests Pest. Chaque session se termine par un tag Git (`lab-01`, `lab-01b`, puis un tag par session).
+L'application combine un site public de publication d'articles, un back-office authentifié avec gestion des rôles et une API REST JSON protégée par jetons Sanctum.
 
-## État actuel (tag lab-08)
+## Fonctionnalités
 
-- `GET /api/categories` et `GET /api/categories/{category}`, avec le nombre d'articles publiés de chaque catégorie.
-- `GET /api/posts?category=<slug>&tag=<slug>` : filtres par catégorie et par tag, comparaison exacte, slug inconnu refusé (422).
-- `POST /api/login` renvoie un jeton Sanctum ; `POST /api/logout` le révoque.
-- `POST`, `PUT/PATCH` et `DELETE /api/posts` protégés par `auth:sanctum`, avec les mêmes Form Requests et la même `PostPolicy` que le site (401, 403 et 422 en JSON).
-- Tests Pest `ApiReadTest` et `ApiWriteTest`.
-
-## Données de démonstration
-
-Après un clone, reconstruire la base avec `php artisan migrate:fresh --seed`. Attention : cette commande vide la base avant de la remplir.
-
-## Routes disponibles
-
-| Méthode | URI | Nom | Action |
-|---|---|---|---|
-| GET | `/` | `home` | `PageController@home` |
-| GET | `/a-propos` | `about` | `PageController@about` |
-| GET | `/heure` | `time` | `PageController@time` |
-| GET | `/posts` | `posts.index` | `PostController@index` |
-| GET | `/posts/archive/{year}` | `posts.archive` | `PostController@archive` |
-| GET | `/posts/categorie/{category:slug}` | `posts.category` | `PostController@byCategory` |
-| GET | `/posts/tag/{tag:slug}` | `posts.tag` | `PostController@byTag` |
-| GET | `/posts/create` | `posts.create` | `PostController@create` |
-| POST | `/posts` | `posts.store` | `PostController@store` |
-| GET | `/posts/{post}` | `posts.show` | `PostController@show` |
-| GET | `/posts/{post}/edit` | `posts.edit` | `PostController@edit` |
-| PUT | `/posts/{post}` | `posts.update` | `PostController@update` |
-| DELETE | `/posts/{post}` | `posts.destroy` | `PostController@destroy` |
-| PATCH | `/posts/{post}/publication` | `posts.publication` | `PostController@togglePublication` |
-| GET | `/admin/categories` | `admin.categories.index` | `CategoryController@index` |
-| GET | `/admin/categories/create` | `admin.categories.create` | `CategoryController@create` |
-| POST | `/admin/categories` | `admin.categories.store` | `CategoryController@store` |
-| GET | `/admin/categories/{category}/edit` | `admin.categories.edit` | `CategoryController@edit` |
-| PUT | `/admin/categories/{category}` | `admin.categories.update` | `CategoryController@update` |
-| DELETE | `/admin/categories/{category}` | `admin.categories.destroy` | `CategoryController@destroy` |
-| GET | `/admin/tags` | `admin.tags.index` | `TagController@index` |
-| GET | `/admin/tags/create` | `admin.tags.create` | `TagController@create` |
-| POST | `/admin/tags` | `admin.tags.store` | `TagController@store` |
-| GET | `/admin/tags/{tag}/edit` | `admin.tags.edit` | `TagController@edit` |
-| PUT | `/admin/tags/{tag}` | `admin.tags.update` | `TagController@update` |
-| DELETE | `/admin/tags/{tag}` | `admin.tags.destroy` | `TagController@destroy` |
-| GET | `/inscription` | `register` | `Auth\RegisterController@create` |
-| POST | `/inscription` | `register.store` | `Auth\RegisterController@store` |
-| GET | `/connexion` | `login` | `Auth\LoginController@create` |
-| POST | `/connexion` | `login.store` | `Auth\LoginController@store` |
-| POST | `/deconnexion` | `logout` | `Auth\LoginController@destroy` |
-| GET | `/admin/utilisateurs` | `admin.users.index` | `Admin\UserController@index` |
-| PATCH | `/admin/utilisateurs/{user}/role` | `admin.users.role` | `Admin\UserController@updateRole` |
-| GET | `/api/posts` | `api.posts.index` | `Api\PostController@index` |
-| GET | `/api/posts/{post}` | `api.posts.show` | `Api\PostController@show` |
-| GET | `/api/categories` | `api.categories.index` | `Api\CategoryController@index` |
-| GET | `/api/categories/{category}` | `api.categories.show` | `Api\CategoryController@show` |
-| POST | `/api/login` | `api.login` | `Api\AuthController@login` |
-| POST | `/api/logout` | `api.logout` | `Api\AuthController@logout` |
-| POST | `/api/posts` | `api.posts.store` | `Api\PostController@store` |
-| PUT/PATCH | `/api/posts/{post}` | `api.posts.update` | `Api\PostController@update` |
-| DELETE | `/api/posts/{post}` | `api.posts.destroy` | `Api\PostController@destroy` |
-
-## Prérequis
-
-- PHP et Composer (PHP 8.3 ou plus depuis https://www.php.net/downloads, avec les extensions curl, fileinfo, mbstring, openssl, pdo_sqlite, sqlite3 et zip activées dans php.ini, et Composer depuis https://getcomposer.org).
-- Node.js LTS et npm.
-- Git.
+- **Site public** : page d'accueil, liste paginée des articles publiés, filtrage par catégorie, tag ou archive annuelle, détail d'un article.
+- **Authentification & rôles** : inscription, connexion, déconnexion par session (`author` et `admin`), protection des routes et gestion des rôles utilisateurs côté administrateur.
+- **Back-office** : création, modification, suppression et publication/dépublication d'articles (`PostPolicy`), gestion des catégories et des tags (`admin`).
+- **API REST JSON** : lecture des articles (avec filtres `?per_page=`, `?category=` et `?tag=`), lecture des catégories et des tags (avec `posts_count` des articles publiés), authentification par jeton Bearer Sanctum et écritures protégées.
+- **Tests Pest** : 97 tests couvrant les pages, l'autorisation, le back-office et l'API en lecture et en écriture.
 
 ## Installation
 
-### Bash (Git Bash, macOS, Linux)
+### Bash
 
 ```bash
 git clone https://github.com/yassinebouazizi-dev/mini-cms.git
 cd mini-cms
 composer install
 npm install
+npm run build
 cp .env.example .env
 php artisan key:generate
 touch database/database.sqlite
-php artisan migrate
+php artisan migrate:fresh --seed
+php artisan test
 composer run dev
 ```
 
-### PowerShell (Windows)
+### PowerShell
 
 ```powershell
 git clone https://github.com/yassinebouazizi-dev/mini-cms.git
 cd mini-cms
 composer install
 npm install
+npm run build
 copy .env.example .env
 php artisan key:generate
-New-Item database\database.sqlite -ItemType File
-php artisan migrate
+New-Item -ItemType File -Force database\database.sqlite
+php artisan migrate:fresh --seed
+php artisan test
 composer run dev
 ```
 
-Ouvrir ensuite http://localhost:8000 (adresse de l'application, différente de l'adresse de Vite sur le port 5173).
+L'application est ensuite accessible sur `http://localhost:8000`.
+
+## Comptes de test
+
+La commande `php artisan migrate:fresh --seed` crée les comptes suivants (mot de passe commun : `password`) :
+
+| Rôle | E-mail | Mot de passe |
+|---|---|---|
+| `admin` | `test@example.com` | `password` |
+| `author` | 2 comptes générés aléatoirement par `UserFactory` | `password` |
+
+Vous pouvez aussi créer un compte `author` directement depuis `/inscription`.
+
+## API
+
+Toutes les requêtes API doivent inclure l'en-tête `Accept: application/json`.
+
+### Endpoints
+
+| Méthode | URI | Nom | Protection | Description |
+|---|---|---|---|---|
+| GET | `/api/posts` | `api.posts.index` | Publique | Liste paginée des articles publiés (`?per_page=1..50`, `?category=<slug>`, `?tag=<slug>`) |
+| GET | `/api/posts/{post}` | `api.posts.show` | Publique (`PostPolicy`) | Détail d'un article publié (403 sur un brouillon) |
+| GET | `/api/categories` | `api.categories.index` | Publique | Liste des catégories avec `posts_count` (publiés uniquement) |
+| GET | `/api/categories/{category}` | `api.categories.show` | Publique | Détail d'une catégorie avec `posts_count` |
+| GET | `/api/tags` | `api.tags.index` | Publique | Liste des tags avec `posts_count` (publiés uniquement) |
+| GET | `/api/tags/{tag}` | `api.tags.show` | Publique | Détail d'un tag avec `posts_count` |
+| POST | `/api/login` | `api.login` | Publique | Vérifie les identifiants et renvoie un jeton Sanctum (`201`) |
+| GET | `/api/user` | — | `auth:sanctum` | Profil de l'utilisateur authentifié |
+| POST | `/api/logout` | `api.logout` | `auth:sanctum` | Révoque le jeton courant (`204`) |
+| POST | `/api/posts` | `api.posts.store` | `auth:sanctum` | Crée un article (`201`) |
+| PUT/PATCH | `/api/posts/{post}` | `api.posts.update` | `auth:sanctum` | Met à jour un article (`PostPolicy`) |
+| DELETE | `/api/posts/{post}` | `api.posts.destroy` | `auth:sanctum` | Supprime un article (`204`, `PostPolicy`) |
+
+### Authentification par jeton
+
+1. Envoyer `POST /api/login` avec un corps JSON `{"email": "test@example.com", "password": "password"}`.
+2. L'API répond `201 Created` avec `token` et `token_type: "Bearer"`.
+3. Pour les routes protégées, envoyer l'en-tête `Authorization: Bearer VOTRE_JETON`.
+4. `POST /api/logout` supprime uniquement le jeton utilisé pour cette requête (`204 No Content`).
+
+### Codes d'erreur
+
+| Code | Signification |
+|---|---|
+| `401` | Jeton absent, invalide ou révoqué (`{"message": "Unauthenticated."}`) |
+| `403` | Action refusée par `PostPolicy` (ex. modification de l'article d'un autre auteur) |
+| `404` | Ressource introuvable en JSON (`{"message": "No query results for model ..."}`) |
+| `422` | Données ou paramètre de filtre invalide (messages de validation en français) |
+
+### Exemple curl.exe
+
+Déconnexion (révocation du jeton courant) :
+
+```powershell
+curl.exe -X POST -H "Accept: application/json" -H "Authorization: Bearer VOTRE_JETON" http://localhost:8000/api/logout
+```
+
+Cette commande renvoie `204 No Content` sans corps de réponse.
 
 ## Captures d'écran
 
-### Page d'accueil
+### Session 01 à 06
 
-![Page d'accueil de Mini-CMS](screenshots/s01-accueil.png)
-
-### Liste des routes
-
-![Sortie de php artisan route:list](screenshots/s01-route-list.png)
-
-### Page À propos
-
-![Page A propos](screenshots/s02-a-propos.png)
-
-### Accueil avec le layout
+![Liste des routes](screenshots/s01-route-list.png)
 
 ![Page d'accueil avec le layout](screenshots/s03-accueil.png)
 
-### Liste des articles
-
-![Liste des articles](screenshots/s03-articles.png)
-
-### Détail d'un article
-
-![Détail d'un article](screenshots/s03-article.png)
-
-### Session 04
-
-![Liste des articles](screenshots/s04-articles.png)
-
-### Session 05
-
-![Liste paginée des articles](screenshots/s05-articles.png)
+![Liste des articles](screenshots/s05-articles.png)
 
 ![Formulaire avec erreurs de validation](screenshots/s05-formulaire.png)
 
-### Session 06
-
 ![Formulaire de modification prérempli](screenshots/s06-modification.png)
 
-![Confirmation de suppression](screenshots/s06-suppression.png)
-
-### Session 07
+### Session 07 à 12
 
 ![Liste des articles avec leur catégorie, leur auteur et leurs tags](screenshots/s07-liste-relations.png)
 
 ![Page d'un article avec ses tags et les articles de la même catégorie](screenshots/s07-detail-tags.png)
 
-### Session 08
-
-![Formulaire de modification avec la catégorie et les tags](screenshots/s08-formulaire-relations.png)
-
 ![Page des articles d'une catégorie](screenshots/s08-page-categorie.png)
-
-### Session 09
-
-![Page d'un article avec le message flash « Article créé. »](screenshots/s09-message-flash.png)
-
-![Page Article introuvable pour un identifiant inexistant](screenshots/s09-article-introuvable.png)
-
-### Session 10
-
-Back-office des catégories et des tags, messages de validation en français, pages 404 et 503 dans le layout du site.
 
 ![Formulaire de catégorie envoyé vide, avec les messages de validation en français](screenshots/s10-validation.png)
 
-![Page 404 du site pour une adresse inconnue](screenshots/s10-404.png)
-
-### Session 11
-
-![Barre de navigation d'un utilisateur connecté, avec le message « Vous êtes connecté. »](screenshots/s11-connexion.png)
+![Barre de navigation d'un utilisateur connecté](screenshots/s11-connexion.png)
 
 ![Page 403 quand un auteur ouvre la modification de l'article d'un autre auteur](screenshots/s11-interdit.png)
 
-### Session 12
+![Page 403 Réservé aux administrateurs pour un compte auteur](screenshots/s12-admin-interdit.png)
 
-![Page 403 « Réservé aux administrateurs. » pour un compte auteur sur /admin/tags](screenshots/s12-admin-interdit.png)
+### Session 13 et 14
 
-![Barre de navigation d'un compte auteur, sans les liens Catégories et Tags](screenshots/s12-menu-auteur.png)
+![Postman : réponse JSON de GET /api/posts?per_page=2](screenshots/s13-postman-liste.png)
 
-### Session 13
-
-![Postman : réponse JSON de GET /api/posts?per_page=2, avec data, links et meta](screenshots/s13-postman-liste.png)
-
-![Postman : réponse 422 de GET /api/posts?per_page=500, avec le message en français](screenshots/s13-postman-422.png)
-
-### Session 14
+![Postman : réponse 422 de GET /api/posts?per_page=500](screenshots/s13-postman-422.png)
 
 ![Postman : POST /api/posts avec un jeton Bearer, onglet Body, réponse 201 Created](screenshots/s14-postman-201.png)
 
 ![Postman : PUT sur l'article d'un autre auteur, réponse 403](screenshots/s14-postman-403.png)
 
-## Comparaison avec le starter kit Livewire
+## Choix d'architecture
 
-| Critère | Mini-CMS (authentification manuelle) | Starter kit Livewire |
-|---|---|---|
-| Routes d'authentification | `routes/web.php` (`/inscription`, `/connexion`, `/deconnexion`) | Enregistrées par Fortify depuis son paquet ; absentes de `routes/web.php` |
-| Inscription | `Auth\RegisterController` (`app/Http/Controllers/Auth/RegisterController.php`) | `app/Actions/Fortify/CreateNewUser.php` (`Validator::make` puis `User::create`) et `resources/views/pages/auth/register.blade.php` |
-| Connexion | `Auth\LoginController::store` (`app/Http/Controllers/Auth/LoginController.php`) | Contrôleur de Fortify et `resources/views/pages/auth/login.blade.php` |
-| Déconnexion | `Auth\LoginController::destroy` (`app/Http/Controllers/Auth/LoginController.php`) | Route `logout` de Fortify ; les mêmes trois opérations dans `app/Livewire/Actions/Logout.php` |
-| Limitation des tentatives | Aucune | 5 tentatives par minute par e-mail et adresse IP (`app/Providers/FortifyServiceProvider.php`) |
-| Mot de passe oublié | Absent | `Features::resetPasswords()` dans `config/fortify.php` |
-| Vérification de l'e-mail | Absente | `Features::emailVerification()`, `MustVerifyEmail` sur `User`, middleware `verified` sur `/dashboard` |
-| Double authentification | Absente | `Features::twoFactorAuthentication()` et `Features::passkeys()` |
-| Rôles et autorisations | Colonne `role`, Gates, `PostPolicy`, middleware `admin` | Aucun : à écrire soi-même |
-| Tests | `AuthTest`, `AuthorizationTest`, `AdminAccessTest`, `PostVisibilityTest` | 10 fichiers dans `tests/Feature` (Auth, Settings, Dashboard) écrits avec PHPUnit |
+### Pourquoi les écritures de l'API passent par PostPolicy
 
-Ce que je garderais du kit dans un vrai projet : Dans un vrai projet en production, je garderais la limitation des tentatives (rate limiting / throttling) et la réinitialisation de mot de passe sécurisée fournies clé en main par Laravel Fortify pour protéger l'application contre les attaques par force brute. En revanche, je conserverais l'architecture des Gates, Policies et middlewares personnalisés développée dans Mini-CMS car les starter kits ne gèrent pas les règles métier d'autorisation.
+Utiliser la même `PostPolicy` et les mêmes Form Requests (`StorePostRequest`, `UpdatePostRequest`) pour le site web et pour l'API garantit qu'il n'y a qu'une seule source de vérité pour les droits et la validation. Si une règle métier change, elle s'applique tout de suite aux deux interfaces, et l'API ne risque pas de devenir un contournement des permissions du site.
+
+### Pourquoi preventLazyLoading est activé
+
+En développement, `Model::preventLazyLoading(! app()->isProduction())` dans `AppServiceProvider` bloque immédiatement toute lecture de relation oubliée dans une boucle, au lieu de laisser passer des requêtes N+1 silencieuses. On est donc obligé de charger les relations à l'avance avec `with()` ou `load()`, tout en gardant la sécurité de ne pas bloquer le site en production.
+
+### Pourquoi l'API utilise des jetons et non la session
+
+Les routes du groupe `api` sont sans état : elles n'utilisent ni cookies ni session PHP. Un client externe comme Postman, `curl.exe` ou une application mobile doit donc prouver son identité à chaque requête avec un jeton Bearer Sanctum, qui peut être révoqué individuellement sans fermer les sessions d'autres appareils.
