@@ -36,6 +36,8 @@ Route::middleware('writable')->group(function () {
         Route::patch('/posts/{post}/publication', [PostController::class, 'togglePublication'])->name('posts.publication');
 
         Route::prefix('admin')->name('admin.')->middleware('admin')->group(function () {
+            Route::get('/utilisateurs', [\App\Http\Controllers\Admin\UserController::class, 'index'])->name('users.index');
+            Route::patch('/utilisateurs/{user}/role', [\App\Http\Controllers\Admin\UserController::class, 'updateRole'])->name('users.role');
             Route::resource('categories', CategoryController::class)->except('show');
             Route::resource('tags', TagController::class)->except('show');
         });
