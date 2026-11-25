@@ -167,5 +167,23 @@ Back-office des catégories et des tags, messages de validation en français, pa
 
 ![Page 403 quand un auteur ouvre la modification de l'article d'un autre auteur](screenshots/s11-interdit.png)
 
+## Comparaison avec le starter kit Livewire
+
+| Critère | Mini-CMS (authentification manuelle) | Starter kit Livewire |
+|---|---|---|
+| Routes d'authentification | `routes/web.php` (`/inscription`, `/connexion`, `/deconnexion`) | Enregistrées par Fortify depuis son paquet ; absentes de `routes/web.php` |
+| Inscription | `Auth\RegisterController` (`app/Http/Controllers/Auth/RegisterController.php`) | `app/Actions/Fortify/CreateNewUser.php` (`Validator::make` puis `User::create`) et `resources/views/pages/auth/register.blade.php` |
+| Connexion | `Auth\LoginController::store` (`app/Http/Controllers/Auth/LoginController.php`) | Contrôleur de Fortify et `resources/views/pages/auth/login.blade.php` |
+| Déconnexion | `Auth\LoginController::destroy` (`app/Http/Controllers/Auth/LoginController.php`) | Route `logout` de Fortify ; les mêmes trois opérations dans `app/Livewire/Actions/Logout.php` |
+| Limitation des tentatives | Aucune | 5 tentatives par minute par e-mail et adresse IP (`app/Providers/FortifyServiceProvider.php`) |
+| Mot de passe oublié | Absent | `Features::resetPasswords()` dans `config/fortify.php` |
+| Vérification de l'e-mail | Absente | `Features::emailVerification()`, `MustVerifyEmail` sur `User`, middleware `verified` sur `/dashboard` |
+| Double authentification | Absente | `Features::twoFactorAuthentication()` et `Features::passkeys()` |
+| Rôles et autorisations | Colonne `role`, Gates, `PostPolicy`, middleware `admin` | Aucun : à écrire soi-même |
+| Tests | `AuthTest`, `AuthorizationTest`, `AdminAccessTest`, `PostVisibilityTest` | 10 fichiers dans `tests/Feature` (Auth, Settings, Dashboard) écrits avec PHPUnit |
+
+Ce que je garderais du kit dans un vrai projet : Dans un vrai projet en production, je garderais la limitation des tentatives (rate limiting / throttling) et la réinitialisation de mot de passe sécurisée fournies clé en main par Laravel Fortify pour protéger l'application contre les attaques par force brute. En revanche, je conserverais l'architecture des Gates, Policies et middlewares personnalisés développée dans Mini-CMS car les starter kits ne gèrent pas les règles métier d'autorisation.
+
+
 
 
