@@ -19,3 +19,9 @@ it('shows the styled 503 page when the site is read-only', function () {
         ->assertSee('Service momentanément indisponible')
         ->assertSee("Retour à l'accueil", false);
 });
+
+it('shows the custom category not found page for an unknown category', function () {
+    $this->get('/posts/categorie/inconnue')
+        ->assertNotFound()
+        ->assertSee('Catégorie introuvable');
+});
